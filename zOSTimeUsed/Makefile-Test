@@ -1,5 +1,5 @@
 
-CXX_PROGX=zosInfoTest
+CXX_PROGX=zosTimeUsedTest
 
 PDMOS:=$(shell uname -s)
 Machine:=$(shell uname -m)
@@ -11,15 +11,15 @@ $(info $(Machine))
 # ************************ USS **************************
 # *******************************************************
 
-CXXFLAGS+=-O2 -std=gnu++20 -fzos-le-char-mode=ascii $(INCLUDE)
+CXXFLAGS+=-O0 -std=gnu++20 -fzos-le-char-mode=ascii $(INCLUDE)
 CC=/usr/lpp/IBM/cnw/openxl/bin/ibm-clang64
 CXX=/usr/lpp/IBM/cnw/openxl/bin/ibm-clang++64
 LD=/usr/lpp/IBM/cnw/openxl/bin/ibm-clang++64
 
-INCLUDE+=-I. -I/usr/local/include  -I/usr/include 
+INCLUDE+=-I. -I./include -I/usr/local/include  -I/usr/include 
 
 
-CXXSOURCES = zosInfoTest.cpp zosInfo.cpp
+CXXSOURCES = zOSTimeUsedTest.cpp zOSTimeUsed.cpp 
 CXXOBJECTS = $(CXXSOURCES:.cpp=.o)  
 
 

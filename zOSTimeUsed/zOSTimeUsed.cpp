@@ -138,7 +138,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    error_message.clear ();
 
    psa *__ptr32 psa_ptr = 0;                  /* PSA is always at virtual address 0. */
-   ascb *__ptr32 ascb_ptr = psa_ptr->psaaold; /* - Pointer to the home (current) ASCB.  @LQC */
+   ascb *__ptr32 ascb_ptr = static_cast<ascb *__ptr32> (psa_ptr->psaaold); /* - Pointer to the home (current) ASCB.  @LQC */
    cvt *__ptr32 cvt_ptr = static_cast<cvt *__ptr32> (psa_ptr->flccvt);
 
 
@@ -273,26 +273,26 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       return -1;
    }
 
-   if (ascb.ascbjbni != 0)
+   if (ascb_ptr->ascbjbni != 0)
    {
-      ebcdic_field_to_ascii (ascb.ascbjbni, 8, zos_time_used.job_name);
+      ebcdic_field_to_ascii (ascb_ptr->ascbjbni, 8, zos_time_used.job_name);
    }
-   else if (ascb.ascbjbns != 0)
+   else if (ascb_ptr->ascbjbns != 0)
    {
-      ebcdic_field_to_ascii (ascb.ascbjbns, 8, zos_time_used.job_name);
+      ebcdic_field_to_ascii (ascb_ptr->ascbjbns, 8, zos_time_used.job_name);
    }
    else
    {
       zos_time_used.job_name = "UNKNOWN";
    }
-   zos_time_used.asid = ascb.ascbasid;
-   zos_time_used.execp_count = ascb.ascbxcnt;
+   zos_time_used.asid = ascb_ptr->ascbasid;
+   zos_time_used.execp_count = ascb_ptr->ascbxcnt;
    /*
     * • Bit 51 represents 1 microsecond.
     * • Bit 31 represents 1.048576 seconds.
     * • Bit 0 increments every 0.000000000232 seconds (approx. 256 picoseconds).
     */
-   double elapsed_time = static_cast<double> (((ascb.ascbejst) / 4096) / 1000000.0);       // Convert from microseconds to seconds
-   double srb_time = static_cast<double> (((ascb.ascbsrbt) / 4096) / 1000000.0);           // Convert from microseconds to seconds
+   double elapsed_time = static_cast<double> (((ascb_ptr->ascbejst) / 4096) / 1000000.0);       // Convert from microseconds to seconds
+   double srb_time = static_cast<double> (((ascb_ptr->ascbsrbt) / 4096) / 1000000.0);           // Convert from microseconds to seconds
    return 0;
 }

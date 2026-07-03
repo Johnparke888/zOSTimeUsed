@@ -30,7 +30,7 @@ int main ()
       std::cerr << "Error retrieving z/OS information: " << error_message << std::endl;
       return 1;
    }
-   std::cout << zos_time_used.to_string() << std::endl;
+   std::cout << zos_time_used.toString() << std::endl;
 
    return 0;
 }

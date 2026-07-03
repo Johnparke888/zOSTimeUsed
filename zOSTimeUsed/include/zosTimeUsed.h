@@ -23,7 +23,7 @@ struct zOS_TimeUsed
    std::string job_name;
  
    public:
-   toString () const
+   std::string toString () const
    {
       std::ostringstream oss;
       oss << "ASID: " << asid << std::endl;
