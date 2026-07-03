@@ -137,7 +137,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
 
    error_message.clear ();
 
-   psa *__ptr32 psa_ptr = 0;                  /* PSA is always at virtual address 0. */
+   psa *__ptr32 psa_ptr = 0;                                               /* PSA is always at virtual address 0. */
    ascb *__ptr32 ascb_ptr = static_cast<ascb *__ptr32> (psa_ptr->psaaold); /* - Pointer to the home (current) ASCB.  @LQC */
    cvt *__ptr32 cvt_ptr = static_cast<cvt *__ptr32> (psa_ptr->flccvt);
 
@@ -266,20 +266,27 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    }
 
    /*
-    * Step 3: sanity check the ECVT acronym. The first 4 bytes of the dsect
+    * Step 3: sanity check the ASCB acronym. The first 4 bytes of the DSECT
     */
    if (!validate_eyecatcher (ascb_ptr, ascb_ptr->ascbascb, ASCB_ACRONYM, 4, "ASCB", "psaaold"))
    {
       return -1;
    }
 
-   if (ascb_ptr->ascbjbni != 0)
+   const unsigned char *__ptr32 job_name_ptr = nullptr;
+
+   if (ascb_ptr->ascbjbni != nullptr)
    {
-      ebcdic_field_to_ascii (ascb_ptr->ascbjbni, 8, zos_time_used.job_name);
+      job_name_ptr = static_cast<const unsigned char *__ptr32> (ascb_ptr->ascbjbni);
    }
-   else if (ascb_ptr->ascbjbns != 0)
+   else if (ascb_ptr->ascbjbns != nullptr)
    {
-      ebcdic_field_to_ascii (ascb_ptr->ascbjbns, 8, zos_time_used.job_name);
+      job_name_ptr = static_cast<const unsigned char *__ptr32> (ascb_ptr->ascbjbns);
+   }
+
+   if (job_name_ptr != nullptr)
+   {
+      ebcdic_field_to_ascii (static_cast<const unsigned char *> (job_name_ptr), 8, zos_time_used.job_name);
    }
    else
    {
@@ -288,9 +295,9 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    zos_time_used.asid = ascb_ptr->ascbasid;
    zos_time_used.execp_count = ascb_ptr->ascbxcnt;
    /*
-    * • Bit 51 represents 1 microsecond.
-    * • Bit 31 represents 1.048576 seconds.
-    * • Bit 0 increments every 0.000000000232 seconds (approx. 256 picoseconds).
+    * â¢ Bit 51 represents 1 microsecond.
+    * â¢ Bit 31 represents 1.048576 seconds.
+    * â¢ Bit 0 increments every 0.000000000232 seconds (approx. 256 picoseconds).
     */
    double elapsed_time = static_cast<double> (((ascb_ptr->ascbejst) / 4096) / 1000000.0);       // Convert from microseconds to seconds
    double srb_time = static_cast<double> (((ascb_ptr->ascbsrbt) / 4096) / 1000000.0);           // Convert from microseconds to seconds

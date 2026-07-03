@@ -8,7 +8,7 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="zOSTimeUsed.vcxproj">
+  <Project Path="zOSTimeUsed.vcxproj" Id="86ddf82b-5dc9-472c-8a4f-8e73d842b9f9">
     <Platform Solution="*|x86" Project="x86" />
     <Deploy Solution="*|x64" />
     <Deploy Solution="Debug|ARM" />
