@@ -299,7 +299,11 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
     * â¢ Bit 31 represents 1.048576 seconds.
     * â¢ Bit 0 increments every 0.000000000232 seconds (approx. 256 picoseconds).
     */
-   double elapsed_time = static_cast<double> (((ascb_ptr->ascbejst) / 4096) / 1000000.0);       // Convert from microseconds to seconds
-   double srb_time = static_cast<double> (((ascb_ptr->ascbsrbt) / 4096) / 1000000.0);           // Convert from microseconds to seconds
+   constexpr double ZOS_TIME_UNITS_PER_SECOND = 4096.0 * 1000000.0;
+
+   zos_time_used.cpu_time_used = static_cast<double> (ascb_ptr->ascbejst) / ZOS_TIME_UNITS_PER_SECOND;
+   zos_time_used.srb_time_used = static_cast<double> (ascb_ptr->ascbsrbt) / ZOS_TIME_UNITS_PER_SECOND;
+
+
    return 0;
 }
