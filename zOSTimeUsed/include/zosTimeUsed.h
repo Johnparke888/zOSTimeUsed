@@ -19,7 +19,7 @@ struct zOS_TimeUsed
    public:
    int asid = 0;
    int execp_count = 0;
-   int cpu_time_limit = 0;
+   double cpu_time_limit = 0.0;
    int dispatching_priority = 0;
    unsigned long long io_service_measure = 0;
    double cpu_time_used = 0.0;

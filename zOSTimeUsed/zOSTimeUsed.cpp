@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 
+constexpr double TOD_INCREMENT = 1.048576;
 constexpr std::size_t ascb_length = 0x0180;
 constexpr std::size_t cct_length = 0x0190;
 constexpr std::size_t csd_length = 0x0200;
@@ -189,19 +190,22 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_offset ("ascbdph", "ascb", offsetof (ascb, ascbdphi), 0x2a);         // - Halfword Dispatching Priority
       display_offset ("ascbjstl", "ascb", offsetof (ascb, ascbjstl), 0x50);        // - CPU Time Limit For The Job Step Unsigned 32 Bit Binary Number
       display_offset ("ascbiosx", "ascb", offsetof (ascb, ascbiosx), 0x160);       // - I/O Service Measure Extended
-      display_offset ("tctajs", "tct", offsetof (tct, tctajs), 0x40);              // - accumulated session service time
-      display_offset ("tctsrbs", "tct", offsetof (tct, tctsrbs), 0x50);            // - accum session srb service (os/vs2)
-      display_offset ("tctejst", "tct", offsetof (tct, tctejst), 0x6c);            // - last value of elapsed tcb time
-      display_offset ("tctlctad", "tct", offsetof (tct, tctlctad), 0x98c);         // address of lct
-      display_offset ("tctsname", "tct", offsetof (tct, tctsname), 0xc8);          // - step name of current step
-      display_offset ("tcttct", "tct", offsetof (tct, tcttct), 0xd0);              // - tct identifier field
-      display_offset ("tcttpexx", "tct", offsetof (tct, tcttpexx), 0x2ab);         // - Last Value of 64-bit EXCP Count for TP
 
-      display_offset ("tctiotbl", "tct", offsetof (tct, tctiotbl), 0x0c);       // - address of the tct i/o table.
-      display_offset ("tctsze", "tct", offsetof (tct, tctsze), 0x12);           // - size in bytes of the tct and the tct storage table
-      display_offset ("tctcpus", "tct", offsetof (tct, tctcpus), 0x20);         // accum session cpu service(os/vs2)
-      display_offset ("tctiocs", "tct", offsetof (tct, tctiocs), 0x2c);         // accum session i/o service(os/vs2)
-      display_offset ("tctppst", "tct", offsetof (tct, tctppst), 0x3c);         // the time of day that the problem program was initially loaded into main storage
+      display_offset ("tctiotbl", "tct", offsetof (tct, tctiotbl), 0x0c);        // - address of the tct i/o table.
+      display_offset ("tctsze", "tct", offsetof (tct, tctsze), 0x12);            // - size in bytes of the tct and the tct storage table
+      display_offset ("tctajs", "tct", offsetof (tct, tctajs), 0x40);            // - accumulated session service time
+      display_offset ("tctsrbs", "tct", offsetof (tct, tctsrbs), 0x50);          // - accum session srb service (os/vs2)
+      display_offset ("tctejst", "tct", offsetof (tct, tctejst), 0x6c);          // - last value of elapsed tcb time
+      display_offset ("tctsname", "tct", offsetof (tct, tctsname), 0xc8);        // - step name of current step
+      display_offset ("tcttct", "tct", offsetof (tct, tcttct), 0xd0);            // - tct identifier field
+      display_offset ("tcttpexx", "tct", offsetof (tct, tcttpexx), 0x2a8);       // - Last Value of 64-bit EXCP Count for TP
+
+      display_offset ("tctopi", "tctomvs", offsetof (tctomvs, tctopi), 0x08);       // - Process ID
+      display_offset ("tctosc", "tctomvs", offsetof (tctomvs, tctosc), 0x1c);       // - Number of syscals requested
+      display_offset ("tctofr", "tctomvs", offsetof (tctomvs, tctofr), 0x28);       // - Number of I/O blocks read for standard files
+      display_offset ("tctofw", "tctomvs", offsetof (tctomvs, tctofw), 0x2c);       // - Number of I/O blocks written for standard files
+      display_offset ("tctokr", "tctomvs", offsetof (tctomvs, tctokr), 0x54);       // - Number of I/O blocks read for Remote socket by the process
+      display_offset ("tctosy", "tctomvs", offsetof (tctomvs, tctosy), 0x64);       // - Number of sync() function calls
 
       std::cout << std::endl;
    }
@@ -304,7 +308,11 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    /*
     * sanity check the TCT acronym. Offset: 208 ('D0' in hex)
     */
-   if (!validate_eyecatcher (tct_ptr, tct_ptr->tcttct, TCT_ACRONYM, 4, "TCT ", "psaaold"))
+   if (!validate_eyecatcher (tct_ptr, tct_ptr->tcttct, TCT_ACRONYM, 4, "TCT ", "tcttct"))
+   {
+      return -1;
+   }
+   if (!validate_eyecatcher (tctomvs_ptr, tctomvs_ptr->tctoid, TCT_OMVS_ACRONYM, 4, "TCTO", "tctoid"))
    {
       return -1;
    }
@@ -339,8 +347,8 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    zos_time_used.cpu_time_used = static_cast<double> (ascb_ptr->ascbejst) / ZOS_TIME_UNITS_PER_SECOND;
    zos_time_used.srb_time_used = static_cast<double> (ascb_ptr->ascbsrbt) / ZOS_TIME_UNITS_PER_SECOND;
 
-   zos_time_used.cpu_time_limit = ascb_ptr->ascbjstl;
-   zos_time_used.dispatching_priority = (int) ascb_ptr->ascbdphi;
+   zos_time_used.cpu_time_limit = (double) ascb_ptr->ascbjstl * TOD_INCREMENT;
+   zos_time_used.dispatching_priority = (int) ascb_ptr->ascbdp;
    zos_time_used.io_service_measure = ascb_ptr->ascbiosx;
 
    return 0;
