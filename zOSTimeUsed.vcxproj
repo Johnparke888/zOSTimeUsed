@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+ï»¿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM">
@@ -57,11 +57,14 @@
     <ClInclude Include="zOSTimeUsed\include\ecvt.h" />
     <ClInclude Include="zOSTimeUsed\include\ascb.h" />
     <ClInclude Include="zOSTimeUsed\include\ieftct.h" />
+    <ClInclude Include="zOSTimeUsed\include\ihaassb.h" />
     <ClInclude Include="zOSTimeUsed\include\pcca.h" />
     <ClInclude Include="zOSTimeUsed\include\pccavt.h" />
     <ClInclude Include="zOSTimeUsed\include\psa.h" />
     <ClInclude Include="zOSTimeUsed\include\rce.h" />
     <ClInclude Include="zOSTimeUsed\include\rmct.h" />
+    <ClInclude Include="zOSTimeUsed\include\tcb.h" />
+    <ClInclude Include="zOSTimeUsed\include\tct.h" />
     <ClInclude Include="zOSTimeUsed\include\zosTimeUsed-version.h" />
     <ClInclude Include="zOSTimeUsed\include\zosTimeUsed.h" />
   </ItemGroup>

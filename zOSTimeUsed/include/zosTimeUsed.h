@@ -19,6 +19,9 @@ struct zOS_TimeUsed
    public:
    int asid = 0;
    int execp_count = 0;
+   int cpu_time_limit = 0;
+   int dispatching_priority = 0;
+   unsigned long long io_service_measure = 0;
    double cpu_time_used = 0.0;
    double srb_time_used = 0.0;
    std::string job_name;
@@ -27,11 +30,14 @@ struct zOS_TimeUsed
    std::string toString () const
    {
       std::ostringstream oss;
-      oss << "ASID: " << asid << std::endl;
-      oss << "Execp Count: " << execp_count << std::endl;
-      oss << "CPU Time Used (seconds): " << std::fixed << std::setprecision (2) << cpu_time_used << std::endl;
-      oss << "SRB Time Used (seconds): " << std::fixed << std::setprecision (2) << srb_time_used << std::endl;
-      oss << "Job Name: " << job_name << std::endl;
+      oss << "ASID: " << asid << " ";
+      oss << "Execp Count: " << execp_count << " ";
+      oss << "CPU Time Used (seconds): " << std::fixed << std::setprecision (2) << cpu_time_used << " ";
+      oss << "SRB Time Used (seconds): " << std::fixed << std::setprecision (2) << srb_time_used << " ";
+      oss << "Dispatching Priority: " << dispatching_priority << " ";
+      oss << "I/O Service Measure: " << io_service_measure << " ";
+      oss << "CPU Time Limit (seconds): " << cpu_time_limit << " ";
+      oss << "Job Name: " << job_name;
       return oss.str ();
    }
 };

@@ -28,6 +28,8 @@
 #include "rce.h"
 #include "csd.h"
 #include "ascb.h"
+#include "tcb.h"
+#include "tct.h"
 #include "zosTimeUsed.h"
 
 #include <cstdio>
@@ -41,27 +43,35 @@
 #include <unistd.h> /* __e2a_l() */
 #endif
 
-#define cct_length 0x0190
-#define csd_length 0x0200
-#define cvt_length 0x0500
-#define ecvt_length 0x0438
-#define pcca_length 0x0248
-#define pccavt_length 0x0200
-#define psa_length 0x1000
-#define rce_length 0x0580
-#define rmct_length 0x0400
-#define ascb_length 0x0180
+#ifndef __MVS__
+#define __ptr32
+#endif
+constexpr std::size_t ascb_length = 0x0180;
+constexpr std::size_t cct_length = 0x0190;
+constexpr std::size_t csd_length = 0x0200;
+constexpr std::size_t cvt_length = 0x0500;
+constexpr std::size_t ecvt_length = 0x0438;
+constexpr std::size_t pcca_length = 0x0248;
+constexpr std::size_t pccavt_length = 0x0200;
+constexpr std::size_t psa_length = 0x1000;
+constexpr std::size_t rce_length = 0x0580;
+constexpr std::size_t rmct_length = 0x0400;
+constexpr std::size_t tcb_length = 0x0198;
+constexpr std::size_t tct_length = 0x02c0;
 // Control block eye-catchers (acronyms) in EBCDIC. These are not necessarily at the start of the
 // block, so we will check them at their documented offsets.
 
-static const unsigned char CVT_ACRONYM[4] = {0x40, 0xC3, 0xE5, 0xE3};
-static const unsigned char ECVT_ACRONYM[4] = {0xC5, 0xC3, 0xE5, 0xE3};
-static const unsigned char RMCT_ACRONYM[4] = {0xD9, 0xD4, 0xC3, 0xE3};
-static const unsigned char CCT_ACRONYM[4] = {0xC3, 0xC3, 0xE3, 0x40};
-static const unsigned char PCCA_ACRONYM[4] = {0xD7, 0xC3, 0xC3, 0xC1};
-static const unsigned char RCE_ACRONYM[4] = {0xD9, 0xC3, 0xC5, 0x40};
-static const unsigned char CSD_ACRONYM[4] = {0xC3, 0xE2, 0xC4, 0x40};
-static const unsigned char ASCB_ACRONYM[4] = {0xC1, 0xE2, 0xC3, 0xC2};
+constexpr unsigned char ASCB_ACRONYM[4] = {0xC1, 0xE2, 0xC3, 0xC2};
+constexpr unsigned char CCT_ACRONYM[4] = {0xC3, 0xC3, 0xE3, 0x40};
+constexpr unsigned char CSD_ACRONYM[4] = {0xC3, 0xE2, 0xC4, 0x40};
+constexpr unsigned char CVT_ACRONYM[4] = {0x40, 0xC3, 0xE5, 0xE3};
+constexpr unsigned char ECVT_ACRONYM[4] = {0xC5, 0xC3, 0xE5, 0xE3};
+constexpr unsigned char PCCA_ACRONYM[4] = {0xD7, 0xC3, 0xC3, 0xC1};
+constexpr unsigned char RCE_ACRONYM[4] = {0xD9, 0xC3, 0xC5, 0x40};
+constexpr unsigned char RMCT_ACRONYM[4] = {0xD9, 0xD4, 0xC3, 0xE3};
+constexpr unsigned char TCB_ACRONYM[4] = {0xE3, 0xC3, 0xC2, 0xE3};
+constexpr unsigned char TCT_ACRONYM[4] = {0xE3, 0xC3, 0xE3, 0x40};
+
 /*
  *  Helper: copy a fixed-length EBCDIC input_field into a NUL-terminated
  *  buffer, convert to ASCII for display, and trim trailing blanks.
@@ -140,7 +150,8 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    psa *__ptr32 psa_ptr = 0;                                               /* PSA is always at virtual address 0. */
    ascb *__ptr32 ascb_ptr = static_cast<ascb *__ptr32> (psa_ptr->psaaold); /* - Pointer to the home (current) ASCB.  @LQC */
    cvt *__ptr32 cvt_ptr = static_cast<cvt *__ptr32> (psa_ptr->flccvt);
-
+   tcb *__ptr32 tcb_ptr = static_cast<tcb *__ptr32> (psa_ptr->psatold);
+   smftct *__ptr32 tct_ptr = static_cast<smftct *__ptr32> (tcb_ptr->tcbtct);
 
    // If we're in testing mode, display the pointers we just read and the sizes of the blocks they point to, so we can verify that our offsets and
    // lengths match reality.
@@ -164,6 +175,8 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_pointer ("psa_ptr", static_cast<void *> (psa_ptr));
       display_pointer ("ascb_ptr", static_cast<void *> (ascb_ptr));
       display_pointer ("cvt_ptr", static_cast<void *> (cvt_ptr));
+      display_pointer ("tcb_ptr", static_cast<void *> (tcb_ptr));
+      display_pointer ("tct_ptr", static_cast<void *> (tct_ptr));
       std::cout << '\n';
 
 
@@ -172,7 +185,12 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_size ("ascb", sizeof (ascb), ascb_length);
 
       std::cout << '\n';
-
+      /*
+       * 42 (2a) signed 2 ascbdph(0) - halfword dispatching priority
+       * 80 (50) signed 4 ascbjstl - cpu time limit for the job step unsigned 32 bit binary number
+       * 352 (160) dbl word 8 ascbiosx - i/o service measure extended. this is like ascbiosc but it is extended
+       * to 8 bytes, so its value continues to grow past the 4gb ascbiosc maximum capacity.
+       */
       display_offset ("cvtecvt", "cvt", offsetof (cvt, cvtecvt), 0x8c);
       display_offset ("ascbejst", "ascb", offsetof (ascb, ascbejst), 0x40);        // Elapsed Job Step Timing Unsigned 64 Bit Binary Number
       display_offset ("ascbsrbt", "ascb", offsetof (ascb, ascbsrbt), 0xc8);        // Accumulated Srb Time
@@ -180,12 +198,16 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_offset ("ascbxcnt", "ascb", offsetof (ascb, ascbxcnt), 0x146);       // Excp Count Field.
       display_offset ("ascbjbni", "ascb", offsetof (ascb, ascbjbni), 0xac);        // Pointer To Jobname Field For Initiated Programs Or Zero
       display_offset ("ascbjbns", "ascb", offsetof (ascb, ascbjbns), 0xb0);        // - Pointer To Jobname Field For Start/Mount/Logon Or Zero
+      display_offset ("ascbdph", "ascb", offsetof (ascb, ascbdph), 0x2a);          // - Halfword Dispatching Priority
+      display_offset ("ascbjstl", "ascb", offsetof (ascb, ascbjstl), 0x50);        // - CPU Time Limit For The Job Step Unsigned 32 Bit Binary Number
+      display_offset ("ascbiosx", "ascb", offsetof (ascb, ascbiosx), 0x160);       // - I/O Service Measure Extended
       std::cout << std::endl;
    }
 
    // At this point we have pointers to all the main control blocks we want to read.
    // We will validate that they look plausible before we trust them.
-   // Validate that the pointers we just read from the CVT look plausible (non-null and point to blocks with the expected eye-catchers).
+   // Validate that the pointers we just read from the CVT look plausible (non-null and point to blocks with the
+   // expected eye-catchers).
 
    auto validate_pointer = [&message, &error_message] (const void *ptr, const char *block_name, const char *pointer_name) -> bool
    {
@@ -203,7 +225,8 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       return true;
    };
 
-   // Helper to validate that a pointer is non-null and that the block it points to starts with the expected eye-catcher bytes.
+   // Helper to validate that a pointer is non-null and that the block it points to starts with the expected eye-catcher
+   // bytes.
    auto validate_eyecatcher = [&message, &error_message, areTesting] (const void *ptr,
                                                                       const unsigned char *actual,
                                                                       const unsigned char *expected,
@@ -304,6 +327,9 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    zos_time_used.cpu_time_used = static_cast<double> (ascb_ptr->ascbejst) / ZOS_TIME_UNITS_PER_SECOND;
    zos_time_used.srb_time_used = static_cast<double> (ascb_ptr->ascbsrbt) / ZOS_TIME_UNITS_PER_SECOND;
 
+   zos_time_used.cpu_time_limit = ascb_ptr->ascbjstl;
+   zos_time_used.dispatching_priority = ascb_ptr->ascbdph;
+   zos_time_used.io_service_measure = ascb_ptr->ascbiosx;
 
    return 0;
 }

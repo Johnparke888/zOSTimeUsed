@@ -3,19 +3,15 @@ TCT heading information
 Common name: SMF TIMING CONTROL TABLE
 Macro ID: IEFTCT
 DSECT name: SMFTCT
-Owning
-component:
-System Management Facilities (SC100)
+Owning component: System Management Facilities (SC100)
 Eye-catcher ID: "TCT "
 Offset: 208 ('D0' in hex)
 Length: 8 bytes
-Storage
-attributes:
+Storage attributes:
 Subpool: 255
 Key: 0
 Residency: Below
-Size: The common area is
-704 bytes ('2C0' in hex)
+Size: The common area is 704 bytes ('2C0' in hex)
 FREQUENCY = 1 per address space
 Created by: IEFSMFIE
 Pointed to by: TCBTCT
