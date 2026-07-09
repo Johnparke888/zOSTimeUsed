@@ -138,7 +138,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    ascb *__ptr32 ascb_ptr = static_cast<ascb *__ptr32> (psa_ptr->psaaold); /* - Pointer to the home (current) ASCB.  @LQC */
    cvt *__ptr32 cvt_ptr = static_cast<cvt *__ptr32> (psa_ptr->flccvt);
    tcb *__ptr32 tcb_ptr = static_cast<tcb *__ptr32> (psa_ptr->psatold);
-   smftct *__ptr32 tct_ptr = reinterpret_cast<smftct *__ptr32> (static_cast<std::uintptr_t> (tcb_ptr->tcbtct.tcbtctb));
+   tct *__ptr32 tct_ptr = reinterpret_cast<tct *__ptr32> (static_cast<std::uintptr_t> (tcb_ptr->tcbtct.tcbtctb));
    tctomvs *__ptr32 tctomvs_ptr = static_cast<tctomvs *__ptr32> (tct_ptr->tctomvsp);
    // If we're in testing mode, display the pointers we just read and the sizes of the blocks they point to, so we can verify that our offsets and
    // lengths match reality.
@@ -173,7 +173,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_size ("psa", sizeof (psa), psa_length);
       display_size ("ascb", sizeof (ascb), ascb_length);
       display_size ("tcb", sizeof (tcb), tcb_length);
-      display_size ("tct", sizeof (smftct), tct_length);
+      display_size ("tct", sizeof (tct), tct_length);
       display_size ("tctomvs", sizeof (tctomvs), tctomvs_length);
       std::cout << '\n';
       /*
@@ -192,8 +192,14 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_offset ("ascbdph", "ascb", offsetof (ascb, ascbdphi), 0x2a);         // - Halfword Dispatching Priority
       display_offset ("ascbjstl", "ascb", offsetof (ascb, ascbjstl), 0x50);        // - CPU Time Limit For The Job Step Unsigned 32 Bit Binary Number
       display_offset ("ascbiosx", "ascb", offsetof (ascb, ascbiosx), 0x160);       // - I/O Service Measure Extended
-      display_offset ("tcttpexx", "tct", offsetof (smftct, tcttpexx), 0x2ab);       // - Last Value of 64-bit EXCP Count for TP
+      display_offset ("tcttpexx", "tct", offsetof (tct, tcttpexx), 0x2ab);       // - Last Value of 64-bit EXCP Count for TP
+      display_offset ("tcttct", "tct", offsetof (tct, tcttct), 0xd0);              // - tct identifier field
 
+      display_offset ("tctajs", "tct", offsetof (tct, tctajs), 0x40);            // - accumulated session service time
+      display_offset ("tctejst", "tct", offsetof (tct, tctejst), 0x6c);          // - last value of elapsed tcb time
+      display_offset ("tctlctad", "tct", offsetof (tct, tctlctad), 0x98c);       // address of lct
+      display_offset ("tctsname", "tct", offsetof (tct, tctsname), 0xc8);        // - step name of current step
+      display_offset ("tctsrbs", "tct", offsetof (tct, tctsrbs), 0xd0);          // - accum session srb service (os/vs2)
       std::cout << std::endl;
    }
 

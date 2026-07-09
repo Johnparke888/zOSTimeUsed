@@ -35,7 +35,7 @@
  *
  */
 
-struct smftct
+struct tct
 {
    unsigned char tctqa[3]; /* -  Queue Address Of Tct                     */
 
@@ -49,10 +49,7 @@ struct smftct
    void *__ptr32 tctcrtbl; /* -  Address Of The Tct Storage Table       */
    void *__ptr32 tctiotbl; /* -  Address Of The Tct I/O Table.  Tct I/O */
 
-
    int tctpool; /* -  subpool/length for tct proper */
-
-
    short int _filler1;     /* -  subpool in which the tct resides          */
    short int tctsze;       /* -  size in bytes of the tct and the tct      */
    void *__ptr32 tctutl;   /* -  address of user time limit routine        */
