@@ -1,4 +1,4 @@
-LIBNAME=zosinfo
+LIBNAME=zostimeused
 STATICLIB=lib$(LIBNAME).a
 
 PDMOS:=$(shell uname -s)
@@ -16,8 +16,8 @@ CC  ?= ibm-clang64
 CXX ?= ibm-clang++64
 AR  ?= ar
 
-INCLUDE += -I. -I/usr/local/include -I/usr/include
-CXXFLAGS += -O2 -std=gnu++20 -fzos-le-char-mode=ascii $(INCLUDE)
+INCLUDE += -I. -I./include -I/usr/local/include -I/usr/include
+CXXFLAGS += -O0 -std=gnu++20 -fzos-le-char-mode=ascii $(INCLUDE)
 
 # Install layout. zopen passes DESTDIR (the prefix, e.g. .../prod/zosinfo).
 DESTDIR ?= /usr/local
@@ -25,9 +25,8 @@ INCDIR  = $(DESTDIR)/include
 LIBDIR  = $(DESTDIR)/lib
 
 # List every public header you want installed.
-HEADERS = zosInfo.h
 
-CXXSOURCES = zosInfo.cpp
+CXXSOURCES = zosTimeUsed.cpp
 CXXOBJECTS = $(CXXSOURCES:.cpp=.o)
 
 all:: $(STATICLIB)
