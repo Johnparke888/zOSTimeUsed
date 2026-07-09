@@ -16,8 +16,10 @@ constexpr std::size_t pccavt_length = 0x0200;
 constexpr std::size_t psa_length = 0x1000;
 constexpr std::size_t rce_length = 0x0580;
 constexpr std::size_t rmct_length = 0x0400;
-constexpr std::size_t tcb_length = 0x0198;
-constexpr std::size_t tct_length = 0x02c0;
+constexpr std::size_t tcb_length = 0x0158;
+constexpr std::size_t tct_length = 0x02d0;
+constexpr std::size_t tctomvs_length = 0x0068;
+
 #ifndef __MVS__
 #define __ptr32
 #endif
@@ -53,8 +55,9 @@ constexpr unsigned char ECVT_ACRONYM[4] = {0xC5, 0xC3, 0xE5, 0xE3};
 constexpr unsigned char PCCA_ACRONYM[4] = {0xD7, 0xC3, 0xC3, 0xC1};
 constexpr unsigned char RCE_ACRONYM[4] = {0xD9, 0xC3, 0xC5, 0x40};
 constexpr unsigned char RMCT_ACRONYM[4] = {0xD9, 0xD4, 0xC3, 0xE3};
-constexpr unsigned char TCB_ACRONYM[4] = {0xE3, 0xC3, 0xC2, 0xE3};
+constexpr unsigned char TCB_ACRONYM[4] = {0xE3, 0xC3, 0xC2, 0x40};
 constexpr unsigned char TCT_ACRONYM[4] = {0xE3, 0xC3, 0xE3, 0x40};
+constexpr unsigned char TCT_OMVS_ACRONYM[4] = {0xE3, 0xC3, 0xE3, 0xD6};
 
 /*
  *  Helper: copy a fixed-length EBCDIC input_field into a NUL-terminated
@@ -136,7 +139,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    cvt *__ptr32 cvt_ptr = static_cast<cvt *__ptr32> (psa_ptr->flccvt);
    tcb *__ptr32 tcb_ptr = static_cast<tcb *__ptr32> (psa_ptr->psatold);
    smftct *__ptr32 tct_ptr = reinterpret_cast<smftct *__ptr32> (static_cast<std::uintptr_t> (tcb_ptr->tcbtct.tcbtctb));
-
+   tctomvs *__ptr32 tctomvs_ptr = static_cast<tctomvs *__ptr32> (tct_ptr->tctomvsp);
    // If we're in testing mode, display the pointers we just read and the sizes of the blocks they point to, so we can verify that our offsets and
    // lengths match reality.
 
@@ -161,6 +164,8 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_pointer ("cvt_ptr", static_cast<void *> (cvt_ptr));
       display_pointer ("tcb_ptr", static_cast<void *> (tcb_ptr));
       display_pointer ("tct_ptr", static_cast<void *> (tct_ptr));
+      display_pointer ("tctomvs_ptr", static_cast<void *> (tctomvs_ptr));
+
       std::cout << '\n';
 
 
@@ -169,7 +174,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_size ("ascb", sizeof (ascb), ascb_length);
       display_size ("tcb", sizeof (tcb), tcb_length);
       display_size ("tct", sizeof (smftct), tct_length);
-
+      display_size ("tctomvs", sizeof (tctomvs), tctomvs_length);
       std::cout << '\n';
       /*
        * 42 (2a) signed 2 ascbdph(0) - halfword dispatching priority

@@ -1,4 +1,4 @@
-LIBNAME=zosinfo
+LIBNAME=zostimeused
 STATICLIB=lib$(LIBNAME).a
 
 PDMOS:=$(shell uname -s)
