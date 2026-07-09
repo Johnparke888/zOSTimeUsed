@@ -1,0 +1,54 @@
+LIBNAME=zosinfo
+STATICLIB=lib$(LIBNAME).a
+
+PDMOS:=$(shell uname -s)
+Machine:=$(shell uname -m)
+$(info $(PDMOS))
+$(info $(Machine))
+
+# *******************************************************
+# ************************ USS **************************
+# *******************************************************
+
+# Use ?= so zopen's CC/CXX/AR (passed on the make command line) take precedence.
+# Bare names resolve via PATH; these are only fallbacks for a manual build.
+CC  ?= /usr/local/gcc-16.1.0/bin/gcc
+CXX ?= /usr/local/gcc-16.1.0/bin/g++
+AR  ?= ar
+
+INCLUDE += -I. -I./include -I/usr/local/include -I/usr/include
+CXXFLAGS += -O0 -std=gnu++2a -fmax-errors=5  $(INCLUDE)
+
+# Install layout. zopen passes DESTDIR (the prefix, e.g. .../prod/zosinfo).
+DESTDIR ?= /usr/local
+INCDIR  = $(DESTDIR)/include
+LIBDIR  = $(DESTDIR)/lib
+
+# List every public header you want installed.
+
+CXXSOURCES = zOSTimeUsed.cpp
+CXXOBJECTS = $(CXXSOURCES:.cpp=.o)
+
+all:: $(STATICLIB)
+
+$(STATICLIB): $(CXXOBJECTS)
+	$(AR) rcs $@ $(CXXOBJECTS)
+
+# Explicit compile rule so zopen's CXX/CXXFLAGS are honored.
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+install:: $(STATICLIB)
+	mkdir -p $(LIBDIR) $(INCDIR)
+	cp $(STATICLIB) $(LIBDIR)/
+	cp $(HEADERS) $(INCDIR)/
+
+clean::
+	$(RM) $(CXXOBJECTS) $(STATICLIB)
+
+check::
+	@echo "All tests passed"
+
+ship:: all
+
+.PHONY: all install clean check ship

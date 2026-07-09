@@ -13,7 +13,7 @@
  * Maps fixed hardware and software storage locations for the related processor.
  *
  * z/OS: z/OS MVS Data Areas Volume 3 (ITK - RQE)
- * © Copyright IBM Corp. 1988, 2020
+ * Â© Copyright IBM Corp. 1988, 2020
  *
  */
 
@@ -26,7 +26,7 @@ struct psa
       struct
       {
          unsigned char flcrnpsw[4]; /* -RESTART NEW PSW (AFTER IPL)        MDC001          */
-         void *__ptr32 _filler1;    /* -  SECOND HALF OF RESTART NEW PSW     MDC128        */
+         void * __ptr32 _filler1;    /* -  SECOND HALF OF RESTART NEW PSW     MDC128        */
          struct
          {
             unsigned char flcropsw[8]; /* -      RESTART OLD PSW (AFTER IPL)                  */

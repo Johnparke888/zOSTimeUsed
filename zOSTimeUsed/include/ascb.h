@@ -34,17 +34,17 @@ struct ascb
       struct
       {
          unsigned char ascbascb[4]; /* -   Acronym In Ebcdic -Ascb-               */
-         void *__ptr32 ascbfwdp;            /* -   Address Of Next Ascb On Ascb Ready   */
-         void *__ptr32 ascbbwdp;            /* -   Address Of Previous Ascb On Ascb     */
-         void *__ptr32 ascbltcs;            /* -   Tcb And Preemptable-Class Srb   @07c */
+         void *__ptr32 ascbfwdp;    /* -   Address Of Next Ascb On Ascb Ready   */
+         void *__ptr32 ascbbwdp;    /* -   Address Of Previous Ascb On Ascb     */
+         void *__ptr32 ascbltcs;    /* -   Tcb And Preemptable-Class Srb   @07c */
          struct
          {
             struct
             {
                void *__ptr32 ascbsvrb_prezos12; /* - Svrb Pool Address.              @Llc        */
-               int ascbsync_prezos12;   /* - Count Used To Synchronize Svrb Pool.       */
-            } ascbsupc_prezos12;        /* - Supervisor Cell Field           @Llc        */
-         } ascbr010;                    /* Reserved As Of Z/Os 1.12        @Lla                   */
+               int ascbsync_prezos12;           /* - Count Used To Synchronize Svrb Pool.       */
+            } ascbsupc_prezos12;                /* - Supervisor Cell Field           @Llc        */
+         } ascbr010;                            /* Reserved As Of Z/Os 1.12        @Lla                   */
          void *__ptr32 ascbiosp;                /* -                 Pointer To Ios Purge Interface       */
          struct
          {
@@ -54,7 +54,7 @@ struct ascb
          struct
          {
             void *__ptr32 ascbsawq_prezos11; /* - Address Of Address Space Srb Web           */
-         } ascb_job_step_seqnum;     /* - Sequence Number Incremented At Job             */
+         } ascb_job_step_seqnum;             /* - Sequence Number Incremented At Job             */
 
          short int ascbasid;         /* -  Address Space Identifier For The     */
                                      /* -  Same As Ascbasid                @L8a  */
@@ -62,28 +62,27 @@ struct ascb
          unsigned char ascbsrmflags; /* -  Srm Flags                             */
          unsigned char ascbll5;      /* -  Flags. Serialization - Local    @D2a */
          char ascbhlhi;              /* -  Indication Of Suspend Locks     @L4c   */
-         struct
-         {
-            char ascbdphi;       /* - High Order Byte Of Halfword     @L4a   */
-            char ascbdp;         /* - Dispatching Priority Range From        */
-         } ascbdph;              /* - Halfword Dispatching Priority   @L4a  */
+
+         char ascbdphi; /* - High Order Byte Of Halfword     @L4a   */
+         char ascbdp;   /* - Dispatching Priority Range From        */
+
          int ascbtcbe;           /* - Count Of Ready Tcbs In The      @Lcc   */
-         void *__ptr32 ascblda;          /* - Pointer To Local Data Area Part Of   */
+         void *__ptr32 ascblda;  /* - Pointer To Local Data Area Part Of   */
          unsigned char ascbrsmf; /* - Rsm Address Space Flags              */
          unsigned char ascbflg3; /* - Flags Needing No Serialization  @Lda   */
          struct
          {
             short int ascbhasi_prezos11;  /* - Local Lock Owning Asid.         @Ljc       */
          } ascbr036;                      /* Reserved As Of Z/Os 1.11        @Lja                   */
-         void *__ptr32 ascbcscb;                  /* - Address Of Cscb                      */
-         void *__ptr32 ascbtsb;                   /* - Address Of Tsb                       */
+         void *__ptr32 ascbcscb;          /* - Address Of Cscb                      */
+         void *__ptr32 ascbtsb;           /* - Address Of Tsb                       */
          unsigned long long int ascbejst; /* - Elapsed Job Step Timing  Unsigned    */
          unsigned long long int ascbewst; /* - Time Of Day Whenever I-Stream Is     */
          int ascbjstl;                    /* - Cpu Time Limit For The Job Step      */
          int ascbecb;                     /* - Rct's Work Ecb                       */
          int ascbubet;                    /* - Time Stamp When User Becomes Ready   */
-         void *__ptr32 ascbtlch;                  /* - Chain Field For Time Limit Exceeded  */
-         void *__ptr32 ascbdump;                  /* - Svc Dump Task Tcb Address            */
+         void *__ptr32 ascbtlch;          /* - Chain Field For Time Limit Exceeded  */
+         void *__ptr32 ascbdump;          /* - Svc Dump Task Tcb Address            */
          struct
          {
             short int ascbaffn;     /* -  Cpu Affinity Indicator               */
@@ -91,7 +90,7 @@ struct ascb
             unsigned char ascbflg1; /* -  Flag Field                           */
          } ascbfw1;                 /* -  Full-Word Label To Be Used For        */
          int ascbtmch;              /* -  Termination Queue Chain              */
-         void *__ptr32 ascbasxb;            /* -  Pointer To Address Space Extension   */
+         void *__ptr32 ascbasxb;    /* -  Pointer To Address Space Extension   */
          struct
          {
             short int ascbswct;     /* - Number Of Times Memory Enters Short  */
@@ -100,18 +99,18 @@ struct ascb
          } ascbfw2;                 /* - Fullword Label To Address Bits In     */
          struct
          {
-            short int _filler1; /* -  First Halfword Of Ascbscnt Must Be   */
-            short int ascbsrbs; /* -  Count Of Srb's Suspended In This     */
-         } ascbscnt;            /* - Fullword Label For Compare And Swap   */
-         void *__ptr32 ascbllwq;        /* -  Address Space Local Lock        @04c */
-         void *__ptr32 ascbrctp;        /* -  Pointer To Region Control Task (Rct) */
+            short int _filler1;  /* -  First Halfword Of Ascbscnt Must Be   */
+            short int ascbsrbs;  /* -  Count Of Srb's Suspended In This     */
+         } ascbscnt;             /* - Fullword Label For Compare And Swap   */
+         void *__ptr32 ascbllwq; /* -  Address Space Local Lock        @04c */
+         void *__ptr32 ascbrctp; /* -  Pointer To Region Control Task (Rct) */
          struct
          {
-            int ascblock;   /* -  Local Lock.  This Offset Fixed By    */
+            int ascblock;           /* -  Local Lock.  This Offset Fixed By    */
             void *__ptr32 ascblswq; /* -  Address Space Local Lock Web    @L8c */
-         } ascblkgp;        /* - Lock Group  (Mdc306)        @Z40fp9a  */
-         int ascbqecb;      /* -  Quiesce Ecb                          */
-         int ascbmecb;      /* -  Memory Create/Delete Ecb             */
+         } ascblkgp;                /* - Lock Group  (Mdc306)        @Z40fp9a  */
+         int ascbqecb;              /* -  Quiesce Ecb                          */
+         int ascbmecb;              /* -  Memory Create/Delete Ecb             */
          void *__ptr32 ascboucb;    /* -  System Resources Manager (Srm) User  */
          void *__ptr32 ascbouxb;    /* -  System Resources Manager (Srm) User  */
          struct
@@ -124,11 +123,11 @@ struct ascb
          {
             int ascbejst_disps;    /* -  Count Of Task Dispatches.               */
          } ascbhreq_prezos11;      /* -  Local Lock Requestor Address    @0cc        */
-         void *__ptr32 ascbiqea;           /* -  Pointer To Iqe For Atcam             */
-         void *__ptr32 ascbrtmc;           /* -  Anchor For Sqa Sdwa Queue            */
+         void *__ptr32 ascbiqea;   /* -  Pointer To Iqe For Atcam             */
+         void *__ptr32 ascbrtmc;   /* -  Anchor For Sqa Sdwa Queue            */
          unsigned char ascbmcc[4]; /* -  Used To Hold A Memory Termination      */
-         void *__ptr32 ascbjbni;           /* -  Pointer To Jobname Field For         */
-         void *__ptr32 ascbjbns;           /* -  Pointer To Jobname Field For         */
+         void *__ptr32 ascbjbni;   /* -  Pointer To Jobname Field For         */
+         void *__ptr32 ascbjbns;   /* -  Pointer To Jobname Field For         */
          struct
          {
             unsigned char ascbsrq1;       /* - First Byte Of Ascbsrq                */
@@ -136,27 +135,27 @@ struct ascb
             unsigned char ascbsrq3;       /* - Third Byte Of Ascbsrq                */
             unsigned char ascbsrq4;       /* - Fourth Byte Of Ascbsrq               */
          } ascbsrq;                       /* - Dispatcher Serialization Required     */
-         void *__ptr32 ascbvgtt;                  /* - Address Of Vsam Global Termination   */
-         void *__ptr32 ascbpctt;                  /* - Address Of Private Catalog           */
+         void *__ptr32 ascbvgtt;          /* - Address Of Vsam Global Termination   */
+         void *__ptr32 ascbpctt;          /* - Address Of Private Catalog           */
          short int ascbssrb;              /* - Count Of Status Stop Srb's           */
          char ascbsmct;                   /* - Number Of Outstanding Step Must        */
          unsigned char ascbsrbm;          /* - Model Psw Byte 0 Used By Srb         */
          int ascbswtl;                    /* - Step Wait Time Limit          Mdc029 */
          unsigned long long int ascbsrbt; /* - Accumulated Srb Time          Mdc030 */
-         void *__ptr32 ascbltcb;                  /* - Tcb And Preemptable-Class Srb   @07c */
+         void *__ptr32 ascbltcb;          /* - Tcb And Preemptable-Class Srb   @07c */
          int ascbltcn;                    /* - Count Of Tcb And Preemptable-   @07a */
          int ascbtcbs;                    /* - Number Of Ready Tcb's.          @L8a */
          int ascblsqt;                    /* - Number Of Tcbs On A Local Lock  @L8a */
-         void *__ptr32 ascbwprb;                  /* - Address Of Wait Post Request Block   */
+         void *__ptr32 ascbwprb;          /* - Address Of Wait Post Request Block   */
          struct
          {
-            char ascbndp;  /* - New Dispatching Priority               */
-            char ascbtndp; /* - New Time Slice Dispatching Priority    */
-            char ascbntsg; /* - New Time Slice Group                   */
-            char ascbiodp; /* - I/O Priority (Mdc374)       @G50ip9a   */
-         } ascbsrdp;       /* - System Resource Manager (Srm)         */
-         void *__ptr32 ascbloci;   /* - Lock Image, Address Of Ascb          */
-         void *__ptr32 ascbcmlw;   /* - Address Of The Web Representing @L8c */
+            char ascbndp;        /* - New Dispatching Priority               */
+            char ascbtndp;       /* - New Time Slice Dispatching Priority    */
+            char ascbntsg;       /* - New Time Slice Group                   */
+            char ascbiodp;       /* - I/O Priority (Mdc374)       @G50ip9a   */
+         } ascbsrdp;             /* - System Resource Manager (Srm)         */
+         void *__ptr32 ascbloci; /* - Lock Image, Address Of Ascb          */
+         void *__ptr32 ascbcmlw; /* - Address Of The Web Representing @L8c */
          struct
          {
             int ascbsrbt_disps; /* - Count Of Srb Dispatches.                */
@@ -166,31 +165,31 @@ struct ascb
             unsigned char ascbsso1[3]; /* - Space Switch Event Owner    @G381p9a   */
             unsigned char ascbsso4;    /* - Space Switch Event Owner    @G381p9a */
          } ascbssom;                   /* - Space Switch Event Owner    @Za58694  */
-         void *__ptr32 ascbaste;               /* - Virtual Address Of Address  @G381p9a */
-         void *__ptr32 ascbltov;               /* - Virtual Address Of The      @G381p9a */
-         void *__ptr32 ascbatov;               /* - Virtual Address Of          @G381p9a */
+         void *__ptr32 ascbaste;       /* - Virtual Address Of Address  @G381p9a */
+         void *__ptr32 ascbltov;       /* - Virtual Address Of The      @G381p9a */
+         void *__ptr32 ascbatov;       /* - Virtual Address Of          @G381p9a */
          short int ascbetc;            /* - Number Of Entry Tables      @G381p9a */
          short int ascbetcn;           /* - Number Of Connections To    @G381p9a */
          short int ascblxr;            /* - Number Of Linkage Indexes   @G381p9a */
          short int ascbaxr;            /* - Number Of Authorization     @G381p9a */
-         void *__ptr32 ascbstkh;               /* - Address Of Local Stack Pool @G381p9a */
+         void *__ptr32 ascbstkh;       /* - Address Of Local Stack Pool @G381p9a */
          struct
          {
-            unsigned char ascbcsw0; /* Byte 0                          @0FA                   */
-            unsigned char ascbcsw1; /* Byte 1                          @0FA                   */
-            unsigned char ascbcsw2; /* Byte 2, Ser: CS                 @0FA                   */
-            unsigned char ascbcsw3; /* Byte 3, Ser: CS                 @0FA                   */
-         } ascbcswd;                /* CS-serialized word              @0FA                   */
-         unsigned char ascbr114[4]; /* Reserved.                       @0FC                   */
-         void *__ptr32 ascbjafbaddr;        /* -                Address of the JAFB             @LQA  */
-         void *__ptr32 ascbxtcb;            /* -                 ADDRESS OF THE JOB STEP @G381P9A     */
+            unsigned char ascbcsw0;  /* Byte 0                          @0FA                   */
+            unsigned char ascbcsw1;  /* Byte 1                          @0FA                   */
+            unsigned char ascbcsw2;  /* Byte 2, Ser: CS                 @0FA                   */
+            unsigned char ascbcsw3;  /* Byte 3, Ser: CS                 @0FA                   */
+         } ascbcswd;                 /* CS-serialized word              @0FA                   */
+         unsigned char ascbr114[4];  /* Reserved.                       @0FC                   */
+         void *__ptr32 ascbjafbaddr; /* -                Address of the JAFB             @LQA  */
+         void *__ptr32 ascbxtcb;     /* -                 ADDRESS OF THE JOB STEP @G381P9A     */
          struct
          {
             unsigned char ascbcs1;        /* - First Byte Of Compare And            */
             unsigned char ascbcs2;        /* - Second Byte Of Compare And Swap @P5a */
             unsigned char ascbr122[2];    /* - Reserved.                       @P5c   */
          } ascbfw3;                       /* - Fullword Label To Address Bits In     */
-         void *__ptr32 ascbgxl;                   /* - Address Of Globally Loaded Module    */
+         void *__ptr32 ascbgxl;           /* - Address Of Globally Loaded Module    */
          unsigned long long int ascbeatt; /* - Expended And Accounted Task Time.    */
          unsigned long long int ascbints; /* - Job Selection Time Stamp.            */
          struct
@@ -200,14 +199,14 @@ struct ascb
             unsigned char ascbll3; /* - Third Byte Of Flags.        @G381p9a */
             unsigned char ascbll4; /* - Fourth Byte Of Flags.       @G381p9a */
          } ascbfw4;                /* - Fullword Label To Address   @G381p9a  */
-         void *__ptr32 ascbrcms;           /* Address Of The Requested    @G381pxu                   */
+         void *__ptr32 ascbrcms;   /* Address Of The Requested    @G381pxu                   */
          int ascbiosc;             /* - I/O Service Measure.        @G381pxu */
          short int ascbpkml;       /* - Pkm Of Last Task Dispatched             */
          short int ascbxcnt;       /* - Excp Count Field.               @L1a */
-         void *__ptr32 ascbnsqa;           /* - Address Of The Sqa Resident          */
-         void *__ptr32 ascbasm;            /* - Address Of The Asm Header.      @L2a */
-         void *__ptr32 ascbassb;           /* - Pointer To Address Space        @D6c */
-         void *__ptr32 ascbtcme;           /* - Pointer To Tcxtb.               @D1a */
+         void *__ptr32 ascbnsqa;   /* - Address Of The Sqa Resident          */
+         void *__ptr32 ascbasm;    /* - Address Of The Asm Header.      @L2a */
+         void *__ptr32 ascbassb;   /* - Pointer To Address Space        @D6c */
+         void *__ptr32 ascbtcme;   /* - Pointer To Tcxtb.               @D1a */
          struct
          {
             unsigned char _filler2;       /* - Byte 0 Of Ascbgqir              @O3a   */
@@ -218,7 +217,7 @@ struct ascb
          unsigned long long int ascbiosx; /* -   I/O Service Measure Extended.   @0ac */
          unsigned char ascbr168[2];       /* - Eserved.                       @0ac    */
          unsigned char ascbsvcn[2];       /* - Vc Number For Type-1 Svc               */
-         void *__ptr32 ascbrsme;                  /* - Pointer To Rsm Address Space    @D5a   */
+         void *__ptr32 ascbrsme;          /* - Pointer To Rsm Address Space    @D5a   */
          struct
          {
             unsigned char ascbavm1; /* -  First Byte Of Ascbavm.          @01a */
@@ -229,9 +228,9 @@ struct ascb
          struct
          {
             void *__ptr32 ascbrsma; /* -  Address Of Rsm's Control Block         */
-         } ascbrsm;         /* -  Address Of Rsm's Control Block        */
-         int ascbdcti;      /* -  Accumulated Channel Connect Time        */
-                            // __Extension__          Ascbend[0]; /* -                END OF ASCB                     @L7C  */
+         } ascbrsm;                 /* -  Address Of Rsm's Control Block        */
+         int ascbdcti;              /* -  Accumulated Channel Connect Time        */
+                                    // __Extension__          Ascbend[0]; /* -                END OF ASCB                     @L7C  */
       };
    };
 };

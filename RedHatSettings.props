@@ -4,7 +4,7 @@
     <GccMinorVersion>2.0</GccMinorVersion>
 	<GccVersion>$(GccMajorVersion).$(GccMinorVersion)</GccVersion>
     <BaseInstallDir>/usr</BaseInstallDir>
-    <ProjectBaseDir>/usr3/zOSInfo</ProjectBaseDir>
+    <ProjectBaseDir>/usr3/zOSTimeUsed</ProjectBaseDir>
     <GccLibPath>$(BaseInstallDir)/local/gcc-$(GccVersion)/lib/gcc/x86_64-pc-linux-gnu/$(GccMajorVersion)/include/c++</GccLibPath>
   </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -15,7 +15,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
   <NMakePreprocessorDefinitions>__cplusplus=202303L;__unix__=1;__linux__=1;__unix=1;__GNUC__=1;</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>$(GccLibPath);$(BaseInstallDir)/include;$(BaseInstallDir)/local/include;$(ProjectBaseDir)/zOSInfo/include;;</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(GccLibPath);$(BaseInstallDir)/include;$(BaseInstallDir)/local/include;$(ProjectBaseDir)/zOSTimeUsed/include;;</NMakeIncludeSearchPath>
     <RemoteCppCompileToolExe>$(BaseInstallDir)/local/gcc-$(GccVersion)/bin/g++</RemoteCppCompileToolExe>
 	 <RemoteCCompileToolExe>$(BaseInstallDir)/local/gcc-$(GccVersion)/bin/gcc</RemoteCCompileToolExe>
   </PropertyGroup>

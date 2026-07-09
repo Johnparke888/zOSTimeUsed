@@ -1,23 +1,26 @@
-/*
- * zosTimeUsed.cpp
- *
- * Retrieve information from z/OS control blocks pertaining to product and sysplex information.
- *
- *     PSA (addr 0) -> FLCCVT at offset x'10' -> CVT
- *
- *
- * Notes:
- *   - The PSA, CVT, and ECVT all live in 31-bit storage. In a 64-bit
- *     (LP64) program, ordinary pointers are 64-bit, so we MUST use
- *     __ptr32 to declare pointers to / inside these blocks. Without
- *     __ptr32 the compiler would sign-extend the 31-bit value or
- *     read 8 bytes instead of 4 and you would chase garbage.
- *
- *   - String fields in these blocks are EBCDIC. We convert any input_field
- *     we want to display with __e2a_l() (a no-op on EBCDIC builds;
- *     a real conversion on ASCII builds).
- */
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <sstream>
+#include <string>
 
+constexpr std::size_t ascb_length = 0x0180;
+constexpr std::size_t cct_length = 0x0190;
+constexpr std::size_t csd_length = 0x0200;
+constexpr std::size_t cvt_length = 0x0500;
+constexpr std::size_t ecvt_length = 0x0438;
+constexpr std::size_t pcca_length = 0x0248;
+constexpr std::size_t pccavt_length = 0x0200;
+constexpr std::size_t psa_length = 0x1000;
+constexpr std::size_t rce_length = 0x0580;
+constexpr std::size_t rmct_length = 0x0400;
+constexpr std::size_t tcb_length = 0x0198;
+constexpr std::size_t tct_length = 0x02c0;
+#ifndef __MVS__
+#define __ptr32
+#endif
 #include "psa.h"
 #include "cvt.h"
 #include "ecvt.h"
@@ -32,32 +35,13 @@
 #include "tct.h"
 #include "zosTimeUsed.h"
 
-#include <cstdio>
-#include <cstring>
-#include <cstdint>
-#include <iostream>
-#include <sstream>
-#include <string>
 
 #if defined(__MVS__)
 #include <unistd.h> /* __e2a_l() */
 #endif
 
-#ifndef __MVS__
-#define __ptr32
-#endif
-constexpr std::size_t ascb_length = 0x0180;
-constexpr std::size_t cct_length = 0x0190;
-constexpr std::size_t csd_length = 0x0200;
-constexpr std::size_t cvt_length = 0x0500;
-constexpr std::size_t ecvt_length = 0x0438;
-constexpr std::size_t pcca_length = 0x0248;
-constexpr std::size_t pccavt_length = 0x0200;
-constexpr std::size_t psa_length = 0x1000;
-constexpr std::size_t rce_length = 0x0580;
-constexpr std::size_t rmct_length = 0x0400;
-constexpr std::size_t tcb_length = 0x0198;
-constexpr std::size_t tct_length = 0x02c0;
+
+
 // Control block eye-catchers (acronyms) in EBCDIC. These are not necessarily at the start of the
 // block, so we will check them at their documented offsets.
 
@@ -151,7 +135,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    ascb *__ptr32 ascb_ptr = static_cast<ascb *__ptr32> (psa_ptr->psaaold); /* - Pointer to the home (current) ASCB.  @LQC */
    cvt *__ptr32 cvt_ptr = static_cast<cvt *__ptr32> (psa_ptr->flccvt);
    tcb *__ptr32 tcb_ptr = static_cast<tcb *__ptr32> (psa_ptr->psatold);
-   smftct *__ptr32 tct_ptr = static_cast<smftct *__ptr32> (tcb_ptr->tcbtct);
+   smftct *__ptr32 tct_ptr = reinterpret_cast<smftct *__ptr32> (static_cast<std::uintptr_t> (tcb_ptr->tcbtct.tcbtctb));
 
    // If we're in testing mode, display the pointers we just read and the sizes of the blocks they point to, so we can verify that our offsets and
    // lengths match reality.
@@ -183,6 +167,8 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_size ("cvt", sizeof (cvt), cvt_length);
       display_size ("psa", sizeof (psa), psa_length);
       display_size ("ascb", sizeof (ascb), ascb_length);
+      display_size ("tcb", sizeof (tcb), tcb_length);
+      display_size ("tct", sizeof (smftct), tct_length);
 
       std::cout << '\n';
       /*
@@ -198,9 +184,11 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_offset ("ascbxcnt", "ascb", offsetof (ascb, ascbxcnt), 0x146);       // Excp Count Field.
       display_offset ("ascbjbni", "ascb", offsetof (ascb, ascbjbni), 0xac);        // Pointer To Jobname Field For Initiated Programs Or Zero
       display_offset ("ascbjbns", "ascb", offsetof (ascb, ascbjbns), 0xb0);        // - Pointer To Jobname Field For Start/Mount/Logon Or Zero
-      display_offset ("ascbdph", "ascb", offsetof (ascb, ascbdph), 0x2a);          // - Halfword Dispatching Priority
+      display_offset ("ascbdph", "ascb", offsetof (ascb, ascbdphi), 0x2a);         // - Halfword Dispatching Priority
       display_offset ("ascbjstl", "ascb", offsetof (ascb, ascbjstl), 0x50);        // - CPU Time Limit For The Job Step Unsigned 32 Bit Binary Number
       display_offset ("ascbiosx", "ascb", offsetof (ascb, ascbiosx), 0x160);       // - I/O Service Measure Extended
+      display_offset ("tcttpexx", "tct", offsetof (smftct, tcttpexx), 0x2ab);       // - Last Value of 64-bit EXCP Count for TP
+
       std::cout << std::endl;
    }
 
@@ -279,23 +267,36 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
 
 
    /*
-    * Step 2: sanity check the CVT acronym. The first 4 bytes of the
+    * sanity check the CVT acronym. The first 4 bytes of the
     * input_field cvtcvt should be the EBCDIC characters ' ','C','V','T'
     *
     */
-   if (!validate_eyecatcher (cvt_ptr, cvt_ptr->cvtcvt, CVT_ACRONYM, 4, "CVT", "FLCCVT"))
+   if (!validate_eyecatcher (cvt_ptr, cvt_ptr->cvtcvt, CVT_ACRONYM, 4, "CVT ", "FLCCVT"))
    {
       return -1;
    }
 
    /*
-    * Step 3: sanity check the ASCB acronym. The first 4 bytes of the DSECT
+    * sanity check the ASCB acronym. The first 4 bytes of the DSECT
     */
    if (!validate_eyecatcher (ascb_ptr, ascb_ptr->ascbascb, ASCB_ACRONYM, 4, "ASCB", "psaaold"))
    {
       return -1;
    }
-
+   /*
+    * sanity check the TCB acronym. At offset 256 (dec.)
+    */
+   if (!validate_eyecatcher (tcb_ptr, tcb_ptr->tcbtcbid, TCB_ACRONYM, 4, "TCB ", "psatold"))
+   {
+      return -1;
+   }
+   /*
+    * sanity check the TCT acronym. Offset: 208 ('D0' in hex)
+    */
+   if (!validate_eyecatcher (tct_ptr, tct_ptr->tcttct, TCT_ACRONYM, 4, "TCT ", "psaaold"))
+   {
+      return -1;
+   }
    const unsigned char *__ptr32 job_name_ptr = nullptr;
 
    if (ascb_ptr->ascbjbni != nullptr)
@@ -328,7 +329,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    zos_time_used.srb_time_used = static_cast<double> (ascb_ptr->ascbsrbt) / ZOS_TIME_UNITS_PER_SECOND;
 
    zos_time_used.cpu_time_limit = ascb_ptr->ascbjstl;
-   zos_time_used.dispatching_priority = ascb_ptr->ascbdph;
+   zos_time_used.dispatching_priority = (int) ascb_ptr->ascbdphi;
    zos_time_used.io_service_measure = ascb_ptr->ascbiosx;
 
    return 0;
