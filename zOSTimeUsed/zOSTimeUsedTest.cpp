@@ -5,8 +5,6 @@
 #define __ptr32
 #endif
 
-#include "zosInfo.h"
-
 #include <cstdio>
 #include <cstring>
 #include <cstdint>

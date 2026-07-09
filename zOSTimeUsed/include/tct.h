@@ -49,7 +49,7 @@ struct tct
    void *__ptr32 tctcrtbl; /* -  Address Of The Tct Storage Table       */
    void *__ptr32 tctiotbl; /* -  Address Of The Tct I/O Table.  Tct I/O */
 
-   int tctpool; /* -  subpool/length for tct proper */
+   int tctpool;            /* -  subpool/length for tct proper */
    short int _filler1;     /* -  subpool in which the tct resides          */
    short int tctsze;       /* -  size in bytes of the tct and the tct      */
    void *__ptr32 tctutl;   /* -  address of user time limit routine        */
@@ -350,40 +350,36 @@ struct tctomvs
    unsigned char tctoid[4]; /* Control Block ID  'TCTO'             @LUA              */
 
    /* -         TCT OpenMVS Header Section           @03A    */
-   struct tctomvsh
-   {
-      unsigned char tctosp;    /* - Subpool                            @LUA              */
-      unsigned char tctoln[3]; /* - Length                             @LUA              */
-   }; /* Control Block Subpool and Length     @LUA              */
+
+   unsigned char tctosp;    /* - Subpool                            @LUA              */
+   unsigned char tctoln[3]; /* - Length                             @LUA              */
 
    /* -        TCT OpenMVS Data Section             @L9C     */
-   struct tctomvsd
-   {
+
       int tctopi; /* -  Process ID                           @LUA */
-      int tctopg; /* -  Process Group ID                     @LUA */
-      int tctoui; /* -  Process User ID                      @LUA */
-      int tctoug; /* -  Process User Group ID                @LUA */
-      int tctosi; /* -  Process Session ID                   @LUA */
-      int tctosc; /* -  Number of syscals requested          @LUA */
-      int tctost; /* -  Total CPU Time accumulated by the    @LUA */
-      int tctodr; /* -  Number of directory I/O blocks read @D1C  */
-      int tctofr; /* -  Number of I/O blocks read for             */
-      int tctofw; /* -  Number of I/O blocks written for          */
-      int tctopr; /* -  Number of I/O blocks read for pipe        */
-      int tctopw; /* -  Number of I/O blocks written for          */
-      int tctosr; /* -  Number of I/O blocks read for             */
-      int tctosw; /* -  Number of I/O blocks written for          */
-      int tctoll; /* -  Number of path name Lookup calls to  @LUA */
-      int tctolp; /* -  Number of path name Lookup calls to  @LUA */
-      int tctogl; /* -  Number of path name Generation calls @LUA */
-      int tctogp; /* -  Number of path name Generation calls @LUA */
-      int tctopp; /* -  OpenMVS parent process ID number     @L2A */
-      int tctokr; /* -  Number of I/O blocks read for Remote      */
-      int tctokw; /* -  Number of I/O blocks written for          */
-      int tctoms; /* -  Number of message queues bytes sent  @L8A */
-      int tctomr; /* -  Number of message queues bytes received   */
-      int tctosy; /* -  Number of sync() function calls      @L9C */
-   };
+   int tctopg; /* -  Process Group ID                     @LUA */
+   int tctoui; /* -  Process User ID                      @LUA */
+   int tctoug; /* -  Process User Group ID                @LUA */
+   int tctosi; /* -  Process Session ID                   @LUA */
+   int tctosc; /* -  Number of syscals requested          @LUA */
+   int tctost; /* -  Total CPU Time accumulated by the    @LUA */
+   int tctodr; /* -  Number of directory I/O blocks read @D1C  */
+   int tctofr; /* -  Number of I/O blocks read for             */
+   int tctofw; /* -  Number of I/O blocks written for          */
+   int tctopr; /* -  Number of I/O blocks read for pipe        */
+   int tctopw; /* -  Number of I/O blocks written for          */
+   int tctosr; /* -  Number of I/O blocks read for             */
+   int tctosw; /* -  Number of I/O blocks written for          */
+   int tctoll; /* -  Number of path name Lookup calls to  @LUA */
+   int tctolp; /* -  Number of path name Lookup calls to  @LUA */
+   int tctogl; /* -  Number of path name Generation calls @LUA */
+   int tctogp; /* -  Number of path name Generation calls @LUA */
+   int tctopp; /* -  OpenMVS parent process ID number     @L2A */
+   int tctokr; /* -  Number of I/O blocks read for Remote      */
+   int tctokw; /* -  Number of I/O blocks written for          */
+   int tctoms; /* -  Number of message queues bytes sent  @L8A */
+   int tctomr; /* -  Number of message queues bytes received   */
+   int tctosy; /* -  Number of sync() function calls      @L9C */
 };
 
 /*

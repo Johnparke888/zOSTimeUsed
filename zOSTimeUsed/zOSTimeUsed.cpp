@@ -43,7 +43,6 @@ constexpr std::size_t tctomvs_length = 0x0068;
 #endif
 
 
-
 // Control block eye-catchers (acronyms) in EBCDIC. These are not necessarily at the start of the
 // block, so we will check them at their documented offsets.
 
@@ -94,7 +93,6 @@ void ebcdic_field_to_ascii (const unsigned char *input_field, std::size_t field_
    }
 }
 
-
 void ebcdic_field_to_ascii (const unsigned char *input_field, std::size_t field_length, std::string &output)
 {
    // Copy the raw EBCDIC bytes into the string (length-based, no null-termination assumption).
@@ -120,7 +118,6 @@ void ebcdic_field_to_ascii (const unsigned char *input_field, std::size_t field_
 
    output.resize (trimmed_length);
 }
-
 
 int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, bool areTesting)
 {
@@ -149,8 +146,8 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
 
       auto display_size = [] (const char *name, std::size_t actual, std::size_t expected)
       {
-         std::cout << std::hex << "size of " << name << "=0x" << actual << " " << name << "_length=0x" << expected
-                   << " match=" << (actual == expected ? "yes" : "no") << std::dec << '\n';
+         std::cout << std::hex << "size of " << name << "=0x" << actual << " " << name << "_length=0x" << expected << " match=" << (actual == expected ? "yes" : "no") << std::dec
+                   << '\n';
       };
 
       auto display_offset = [] (const char *field_name, const char *struct_name, std::size_t actual, std::size_t expected)
@@ -192,14 +189,20 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_offset ("ascbdph", "ascb", offsetof (ascb, ascbdphi), 0x2a);         // - Halfword Dispatching Priority
       display_offset ("ascbjstl", "ascb", offsetof (ascb, ascbjstl), 0x50);        // - CPU Time Limit For The Job Step Unsigned 32 Bit Binary Number
       display_offset ("ascbiosx", "ascb", offsetof (ascb, ascbiosx), 0x160);       // - I/O Service Measure Extended
-      display_offset ("tcttpexx", "tct", offsetof (tct, tcttpexx), 0x2ab);       // - Last Value of 64-bit EXCP Count for TP
+      display_offset ("tctajs", "tct", offsetof (tct, tctajs), 0x40);              // - accumulated session service time
+      display_offset ("tctsrbs", "tct", offsetof (tct, tctsrbs), 0x50);            // - accum session srb service (os/vs2)
+      display_offset ("tctejst", "tct", offsetof (tct, tctejst), 0x6c);            // - last value of elapsed tcb time
+      display_offset ("tctlctad", "tct", offsetof (tct, tctlctad), 0x98c);         // address of lct
+      display_offset ("tctsname", "tct", offsetof (tct, tctsname), 0xc8);          // - step name of current step
       display_offset ("tcttct", "tct", offsetof (tct, tcttct), 0xd0);              // - tct identifier field
+      display_offset ("tcttpexx", "tct", offsetof (tct, tcttpexx), 0x2ab);         // - Last Value of 64-bit EXCP Count for TP
 
-      display_offset ("tctajs", "tct", offsetof (tct, tctajs), 0x40);            // - accumulated session service time
-      display_offset ("tctejst", "tct", offsetof (tct, tctejst), 0x6c);          // - last value of elapsed tcb time
-      display_offset ("tctlctad", "tct", offsetof (tct, tctlctad), 0x98c);       // address of lct
-      display_offset ("tctsname", "tct", offsetof (tct, tctsname), 0xc8);        // - step name of current step
-      display_offset ("tctsrbs", "tct", offsetof (tct, tctsrbs), 0xd0);          // - accum session srb service (os/vs2)
+      display_offset ("tctiotbl", "tct", offsetof (tct, tctiotbl), 0x0c);       // - address of the tct i/o table.
+      display_offset ("tctsze", "tct", offsetof (tct, tctsze), 0x12);           // - size in bytes of the tct and the tct storage table
+      display_offset ("tctcpus", "tct", offsetof (tct, tctcpus), 0x20);         // accum session cpu service(os/vs2)
+      display_offset ("tctiocs", "tct", offsetof (tct, tctiocs), 0x2c);         // accum session i/o service(os/vs2)
+      display_offset ("tctppst", "tct", offsetof (tct, tctppst), 0x3c);         // the time of day that the problem program was initially loaded into main storage
+
       std::cout << std::endl;
    }
 
@@ -226,12 +229,9 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
 
    // Helper to validate that a pointer is non-null and that the block it points to starts with the expected eye-catcher
    // bytes.
-   auto validate_eyecatcher = [&message, &error_message, areTesting] (const void *ptr,
-                                                                      const unsigned char *actual,
-                                                                      const unsigned char *expected,
-                                                                      std::size_t length,
-                                                                      const char *block_name,
-                                                                      const char *pointer_name) -> bool
+   auto validate_eyecatcher =
+       [&message, &error_message, areTesting] (
+           const void *ptr, const unsigned char *actual, const unsigned char *expected, std::size_t length, const char *block_name, const char *pointer_name) -> bool
    {
       if (ptr == nullptr)
       {
