@@ -63,8 +63,8 @@ struct ascb
          unsigned char ascbll5;      /* -  Flags. Serialization - Local    @D2a */
          char ascbhlhi;              /* -  Indication Of Suspend Locks     @L4c   */
 
-         char ascbdphi; /* - High Order Byte Of Halfword     @L4a   */
-         char ascbdp;   /* - Dispatching Priority Range From        */
+         unsigned char ascbdphi; /* - High Order Byte Of Halfword     @L4a   */
+         unsigned char ascbdp;   /* - Dispatching Priority Range From        */
 
          int ascbtcbe;           /* - Count Of Ready Tcbs In The      @Lcc   */
          void *__ptr32 ascblda;  /* - Pointer To Local Data Area Part Of   */
@@ -78,7 +78,7 @@ struct ascb
          void *__ptr32 ascbtsb;           /* - Address Of Tsb                       */
          unsigned long long int ascbejst; /* - Elapsed Job Step Timing  Unsigned    */
          unsigned long long int ascbewst; /* - Time Of Day Whenever I-Stream Is     */
-         int ascbjstl;                    /* - Cpu Time Limit For The Job Step      */
+         unsigned int ascbjstl;           /* - Cpu Time Limit For The Job Step      */
          int ascbecb;                     /* - Rct's Work Ecb                       */
          int ascbubet;                    /* - Time Stamp When User Becomes Ready   */
          void *__ptr32 ascbtlch;          /* - Chain Field For Time Limit Exceeded  */

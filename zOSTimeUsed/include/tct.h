@@ -33,6 +33,12 @@
  * mapping macro, and pointed to from fields within the TCT. However, they are NOT contiguous in storage to the TCT or each
  * other.
  *
+ * SMF record type:
+ *                 30 -> Common Address Space Work
+ *                 32 -> TSO
+ *                 33 -> APPC
+ *                 42 -> DFSMS Statistics and Configuration
+ *                 70 -> RMF Processor Activity
  */
 
 struct tct
@@ -49,7 +55,7 @@ struct tct
    void *__ptr32 tctcrtbl; /* -  Address Of The Tct Storage Table       */
    void *__ptr32 tctiotbl; /* -  Address Of The Tct I/O Table.  Tct I/O */
 
-   short int tctpool;       /* -  subpool/length for tct proper */
+   short int tctpool;      /* -  subpool/length for tct proper */
    short int tctsze;       /* -  size in bytes of the tct and the tct      */
    void *__ptr32 tctutl;   /* -  address of user time limit routine        */
    void *__ptr32 tctudata; /* -  address of a one-word parameter list      */
@@ -355,7 +361,7 @@ struct tctomvs
 
    /* -        TCT OpenMVS Data Section             @L9C     */
 
-      int tctopi; /* -  Process ID                           @LUA */
+   int tctopi; /* -  Process ID                           @LUA */
    int tctopg; /* -  Process Group ID                     @LUA */
    int tctoui; /* -  Process User ID                      @LUA */
    int tctoug; /* -  Process User Group ID                @LUA */
@@ -401,17 +407,17 @@ struct tctarmd
    unsigned char tctartp[8];  /* Element Type                         @L1A              */
    unsigned char tctarrg[16]; /* Restart Group for Element            @L1A              */
    unsigned char tctarsn[8];  /* The system name for the system on    @L1A              */
-   int tctargt;               /* -            Time (local) Element requested       @L1A */
-   unsigned char tctargd;     /* -            Date Element requested REGISTER      @L1A */
+   int tctargt;               /* - Time (local) Element requested       @L1A */
+   unsigned char tctargd;     /* - Date Element requested REGISTER      @L1A */
    unsigned char _filler3[3];
-   int tctarwt;           /* -            Time (local) Element requested       @L1A */
-   unsigned char tctarwd; /* -            Date Element requested WAITPRED      @L1A */
+   int tctarwt;           /* - Time (local) Element requested       @L1A */
+   unsigned char tctarwd; /* - Date Element requested WAITPRED      @L1A */
    unsigned char _filler4[3];
-   int tctaryt;           /* -            Time (local) Element was READY,      @L1A */
-   unsigned char tctaryd; /* -            Date Element was READY, in the       @L1A */
+   int tctaryt;           /* - Time (local) Element was READY,      @L1A */
+   unsigned char tctaryd; /* - Date Element was READY, in the       @L1A */
    unsigned char _filler5[3];
-   int tctartt;           /* -            Time (local) Element was             @L1A */
-   unsigned char tctartd; /* -            Date Element was DEREGISTERED, in    @L1A */
+   int tctartt;           /* - Time (local) Element was             @L1A */
+   unsigned char tctartd; /* - Date Element was DEREGISTERED, in    @L1A */
 };
 
 /* Values for field "tctsw" */

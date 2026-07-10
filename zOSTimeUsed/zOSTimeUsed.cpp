@@ -20,6 +20,7 @@ constexpr std::size_t rmct_length = 0x0400;
 constexpr std::size_t tcb_length = 0x0158;
 constexpr std::size_t tct_length = 0x02d0;
 constexpr std::size_t tctomvs_length = 0x0068;
+constexpr std::size_t tctcore_length = 0x34;
 
 #ifndef __MVS__
 #define __ptr32
@@ -138,6 +139,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    tcb *__ptr32 tcb_ptr = static_cast<tcb *__ptr32> (psa_ptr->psatold);
    tct *__ptr32 tct_ptr = reinterpret_cast<tct *__ptr32> (static_cast<std::uintptr_t> (tcb_ptr->tcbtct.tcbtctb));
    tctomvs *__ptr32 tctomvs_ptr = static_cast<tctomvs *__ptr32> (tct_ptr->tctomvsp);
+   tctcore *__ptr32 tctcore_ptr = static_cast<tctcore *__ptr32> (tct_ptr->tctcrtbl);
    // If we're in testing mode, display the pointers we just read and the sizes of the blocks they point to, so we can verify that our offsets and
    // lengths match reality.
 
@@ -163,6 +165,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_pointer ("tcb_ptr", static_cast<void *> (tcb_ptr));
       display_pointer ("tct_ptr", static_cast<void *> (tct_ptr));
       display_pointer ("tctomvs_ptr", static_cast<void *> (tctomvs_ptr));
+      display_pointer ("tctcore_ptr", static_cast<void *> (tctcore_ptr));
 
       std::cout << '\n';
 
@@ -173,6 +176,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       display_size ("tcb", sizeof (tcb), tcb_length);
       display_size ("tct", sizeof (tct), tct_length);
       display_size ("tctomvs", sizeof (tctomvs), tctomvs_length);
+      display_size ("tctcore", sizeof (tctcore), tctcore_length);
       std::cout << '\n';
       /*
        * 42 (2a) signed 2 ascbdph(0) - halfword dispatching priority
@@ -335,6 +339,18 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    {
       zos_time_used.job_name = "UNKNOWN";
    }
+   if (areTesting)
+   {
+      double x = 1.112;
+      double y = 1.111;
+      double z = 0.0;
+      constexpr long long int number_of_iterations = 100000000;
+      for (long long int i = 0; i < number_of_iterations; ++i)
+      {
+         z += x * y;
+      }
+      std::cout << "z =" << z << std::endl;
+   }
    zos_time_used.asid = ascb_ptr->ascbasid;
    zos_time_used.execp_count = ascb_ptr->ascbxcnt;
    /*
@@ -346,10 +362,63 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
 
    zos_time_used.cpu_time_used = static_cast<double> (ascb_ptr->ascbejst) / ZOS_TIME_UNITS_PER_SECOND;
    zos_time_used.srb_time_used = static_cast<double> (ascb_ptr->ascbsrbt) / ZOS_TIME_UNITS_PER_SECOND;
-
-   zos_time_used.cpu_time_limit = (double) ascb_ptr->ascbjstl * TOD_INCREMENT;
-   zos_time_used.dispatching_priority = (int) ascb_ptr->ascbdp;
+  
+   if (ascb_ptr->ascbjstl == -1)
+   {
+      zos_time_used.cpu_time_limit = -1.0;
+   }
+   else
+   {
+      zos_time_used.cpu_time_limit = static_cast<double> (ascb_ptr->ascbjstl) * TOD_INCREMENT;
+         
+   }
+ 
+   zos_time_used.dispatching_priority = ascb_ptr->ascbdp;
    zos_time_used.io_service_measure = ascb_ptr->ascbiosx;
 
+   if (areTesting)
+   {
+      std::cout << "ascb_ptr->ascbdp=" << static_cast<int> (ascb_ptr->ascbdp) << std::endl;
+      std::cout << "tct_ptr->tctajs=" << tct_ptr->tctajs << std::endl;
+      std::cout << "tct_ptr->tctsrbs=" << tct_ptr->tctsrbs << std::endl;
+      std::cout << "tct_ptr->tctsrbs=" << tct_ptr->tctsrbs << std::endl;
+      std::cout << "tct_ptr->tctejst=" << tct_ptr->tctejst << std::endl;
+      std::cout << "tct_ptr->tctsrbt=" << tct_ptr->tctsrbt << std::endl;
+      std::cout << "tct_ptr->tcttpexp=" << tct_ptr->tcttpexp << std::endl;
+      std::cout << "tct_ptr->tctasst=" << tct_ptr->tctasst << std::endl;
+      std::cout << "tct_ptr->tct_time_on_cp=" << tct_ptr->tct_time_on_cp << std::endl;
+      std::cout << "tct_ptr->tctlucnt=" << tct_ptr->tctlucnt << std::endl;
+      std::cout << "tct_ptr->tctsvtex=" << tct_ptr->tctsvtex << std::endl;
+      std::cout << "tct_ptr->tctecpt=" << tct_ptr->tctecpt << std::endl;
+      std::cout << "tct_ptr->tctecptc=" << tct_ptr->tctecptc << std::endl;
+      std::cout << "tct_ptr->tctecpu=" << tct_ptr->tctecpu << std::endl;
+
+      std::cout << "tctomvs_ptr->tctopr=" << tctomvs_ptr->tctopr << std::endl;
+      std::cout << "tctomvs_ptr->tctopw=" << tctomvs_ptr->tctopw << std::endl;
+      std::cout << "tctomvs_ptr->tctosr=" << tctomvs_ptr->tctosr << std::endl;
+      std::cout << "tctomvs_ptr->tctosw=" << tctomvs_ptr->tctosw << std::endl;
+      std::cout << "tctomvs_ptr->tctoll=" << tctomvs_ptr->tctoll << std::endl;
+      std::cout << "tctomvs_ptr->tctolp=" << tctomvs_ptr->tctolp << std::endl;
+      std::cout << "tctomvs_ptr->tctogl=" << tctomvs_ptr->tctogl << std::endl;
+      std::cout << "tctomvs_ptr->tctogp=" << tctomvs_ptr->tctogp << std::endl;
+      std::cout << "tctomvs_ptr->tctopp=" << tctomvs_ptr->tctopp << std::endl;
+      std::cout << "tctomvs_ptr->tctokr=" << tctomvs_ptr->tctokr << std::endl;
+      std::cout << "tctomvs_ptr->tctokw=" << tctomvs_ptr->tctokw << std::endl;
+      std::cout << "tctomvs_ptr->tctoms=" << tctomvs_ptr->tctoms << std::endl;
+      std::cout << "tctomvs_ptr->tctomr=" << tctomvs_ptr->tctomr << std::endl;
+      std::cout << "tctomvs_ptr->tctosy=" << tctomvs_ptr->tctosy << std::endl;
+     
+      std::cout << "tctcore_ptr->tctlwm=" << tctcore_ptr->tctlwm << std::endl;
+      std::cout << "tctcore_ptr->tcthwm=" << tctcore_ptr->tcthwm << std::endl;
+      std::cout << "tctcore_ptr->tctminc=" << tctcore_ptr->tctminc << std::endl;
+      std::cout << "tctcore_ptr->tctehwm=" << tctcore_ptr->tctehwm << std::endl;
+      std::cout << "tctcore_ptr->tctelwm=" << tctcore_ptr->tctelwm << std::endl;
+      std::cout << "tctcore_ptr->tctrgnb=" << tctcore_ptr->tctrgnb << std::endl;
+      std::cout << "tctcore_ptr->tctergnb=" << tctcore_ptr->tctergnb << std::endl;
+      std::cout << "tctcore_ptr->tctrsz=" << tctcore_ptr->tctrsz << std::endl;
+      std::cout << "tctcore_ptr->tctrsv01=" << tctcore_ptr->tctrsv01 << std::endl;
+      std::cout << "tctcore_ptr->inttctmem=" << tctcore_ptr->inttctmem << std::endl;
+
+   }
    return 0;
 }
