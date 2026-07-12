@@ -349,7 +349,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       {
          z += x * y;
       }
-      std::cout << "z =" << z << std::endl;
+      std::cout << "z=" << z << std::endl;
    }
    zos_time_used.asid = ascb_ptr->ascbasid;
    zos_time_used.execp_count = ascb_ptr->ascbxcnt;
@@ -362,7 +362,7 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
 
    zos_time_used.cpu_time_used = static_cast<double> (ascb_ptr->ascbejst) / ZOS_TIME_UNITS_PER_SECOND;
    zos_time_used.srb_time_used = static_cast<double> (ascb_ptr->ascbsrbt) / ZOS_TIME_UNITS_PER_SECOND;
-  
+
    if (ascb_ptr->ascbjstl == -1)
    {
       zos_time_used.cpu_time_limit = -1.0;
@@ -370,15 +370,35 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
    else
    {
       zos_time_used.cpu_time_limit = static_cast<double> (ascb_ptr->ascbjstl) * TOD_INCREMENT;
-         
    }
- 
+
    zos_time_used.dispatching_priority = ascb_ptr->ascbdp;
    zos_time_used.io_service_measure = ascb_ptr->ascbiosx;
 
    if (areTesting)
    {
       std::cout << "ascb_ptr->ascbdp=" << static_cast<int> (ascb_ptr->ascbdp) << std::endl;
+      /*
+       * Field Type    Name  Description
+       *
+       * int    tctiocs     accum session i/o service
+       * int    tctajs      accumulated session service time
+       * int    tctact      accumulated active time
+       * int    tctsrbs     Accum Session SRB Service
+       * int    tctejst     Last Value Of Elapsed TCB Time
+       * int    tctsrbt     Last Value Of Elapsed SRB Time
+       * int    tctsvtep    Last Value Of Total Block Count
+       * int    tctasst     Additional SRB Service Time
+       * int    tctecpt     Enclave CPU Time
+       * int    tctetim     Enclave Transaction Active Time
+       * int    tctecpu     Enclave CPU Service Units
+       * int    tctetc      Enclave Transaction Count
+       * int    tctasstc    Additional SRB Service Time (Cumulative)
+       * int    tctecptc    Enclave CPU Time (Cumulative)
+       * int    tctdet      Dependent Enclave CPU Time
+       * unsigned long long int tctsvtex  64-bit Total Block Count
+       *
+       */
       std::cout << "tct_ptr->tctajs=" << tct_ptr->tctajs << std::endl;
       std::cout << "tct_ptr->tctsrbs=" << tct_ptr->tctsrbs << std::endl;
       std::cout << "tct_ptr->tctsrbs=" << tct_ptr->tctsrbs << std::endl;
@@ -392,7 +412,35 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       std::cout << "tct_ptr->tctecpt=" << tct_ptr->tctecpt << std::endl;
       std::cout << "tct_ptr->tctecptc=" << tct_ptr->tctecptc << std::endl;
       std::cout << "tct_ptr->tctecpu=" << tct_ptr->tctecpu << std::endl;
-
+     
+      /*
+       * Field Type    Name  Description
+       *
+       * int  tctopi - Process ID
+       * int  tctopg - Process Group ID
+       * int  tctoui - Process User ID
+       * int  tctoug - Process User Group ID
+       * int  tctosi - Process Session ID
+       * int  tctosc - Number of syscals requested
+       * int  tctost - Total CPU Time accumulated by the syscals requested
+       * int  tctodr - Number of directory I/O blocks read
+       * int  tctofr - Number of I/O blocks read for standard files
+       * int  tctofw - Number of I/O blocks written for standard files
+       * int  tctopr - Number of I/O blocks read for pipe files
+       * int  tctopw - Number of I/O blocks written for pipe files
+       * int  tctosr - Number of I/O blocks read for special files
+       * int  tctosw - Number of I/O blocks written for special files
+       * int  tctoll - Number of path name Lookup calls to the logical file system
+       * int  tctolp - Number of path name Lookup calls to the physical file system
+       * int  tctogl - Number of path name Generation calls to the logical file system
+       * int  tctogp - Number of path name Generation calls to the physical file system
+       * int  tctopp - OpenMVS parent process ID number
+       * int  tctokr - Number of I/O blocks read for Remote socket by the process
+       * int  tctokw - Number of I/O blocks written for Remote socket by the process
+       * int  tctoms - Number of message queues bytes sent
+       * int  tctomr - Number of message queues bytes received
+       * int  tctosy - Number of sync() function calls
+       */
       std::cout << "tctomvs_ptr->tctopr=" << tctomvs_ptr->tctopr << std::endl;
       std::cout << "tctomvs_ptr->tctopw=" << tctomvs_ptr->tctopw << std::endl;
       std::cout << "tctomvs_ptr->tctosr=" << tctomvs_ptr->tctosr << std::endl;
@@ -407,7 +455,19 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       std::cout << "tctomvs_ptr->tctoms=" << tctomvs_ptr->tctoms << std::endl;
       std::cout << "tctomvs_ptr->tctomr=" << tctomvs_ptr->tctomr << std::endl;
       std::cout << "tctomvs_ptr->tctosy=" << tctomvs_ptr->tctosy << std::endl;
-     
+      /*
+      * Field Type    Name  Description
+      * int           tctlwm - max virtual storage in user subpools below 16m
+      * int           tcthwm - max virtual storage in SWA and LSQA below 16m
+      * int           tctehwm - max virtual storage in SWA and LSQA above 16m
+      * int           tctelwm - max virtual storage in user subpools above 16m
+      * int           tctrgnb private area below 16m in bytes
+      * int           tctergnb private area above 16m in bytes
+      * int           tctrsz original region request in 2k blocks
+      * int           tctrsv01 - reserved
+      * long long int tctmem - memlimit in MB
+
+      */
       std::cout << "tctcore_ptr->tctlwm=" << tctcore_ptr->tctlwm << std::endl;
       std::cout << "tctcore_ptr->tcthwm=" << tctcore_ptr->tcthwm << std::endl;
       std::cout << "tctcore_ptr->tctminc=" << tctcore_ptr->tctminc << std::endl;
@@ -418,7 +478,6 @@ int get_zos_time_used (zOS_TimeUsed &zos_time_used, std::string &error_message, 
       std::cout << "tctcore_ptr->tctrsz=" << tctcore_ptr->tctrsz << std::endl;
       std::cout << "tctcore_ptr->tctrsv01=" << tctcore_ptr->tctrsv01 << std::endl;
       std::cout << "tctcore_ptr->inttctmem=" << tctcore_ptr->inttctmem << std::endl;
-
    }
    return 0;
 }
